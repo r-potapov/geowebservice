@@ -1,0 +1,69 @@
+﻿@{ 
+    var roleName = Request["roleName"];
+    List<SelectListItem> usersWithRole = new List<SelectListItem>();
+    var message = "";
+     
+    if(IsPost) 
+    { 
+        // Delete role 
+        if(!roleName.IsEmpty()) 
+        { 
+            if(Roles.GetUsersInRole(roleName).Length == 0)
+            {
+                Roles.DeleteRole(roleName, true);
+                Response.Redirect("roles");
+            }
+            else
+            {
+                message = "Для удаления роли необходимо удалить ее у всех пользователей";
+                var db = Database.Open("GoogleMaps");
+                var sqlCommand = "SELECT username FROM users ORDER BY username"; 
+                foreach(var item in db.Query(sqlCommand)) 
+                { 
+                    if (Roles.IsUserInRole(item.username, roleName)) 
+                    {
+                        usersWithRole.Add(new SelectListItem { Text = item.username });
+                    }
+                } 
+            }
+        } 
+         
+        
+    }
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Удаление роли";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Удаление роли @roleName</div>
+} 
+<div>
+    <h2>Удаление роли</h2>
+    @if(message!="")
+    {
+        <p class="error">@message</p>
+        @Html.DropDownList("newUser", usersWithRole)
+    }
+    <p>Вы уверены, что хотите удалить роль @roleName?</p>
+    <p> 
+        <form action="" method="post"> 
+            @Html.Hidden("roleName", roleName) 
+            <input type="submit" value="Удалить" class="button" /> 
+            <input type="button"  
+                onclick="window.location.href='roleDetails.cshtml?roleName=@roleName';"  
+                value="Отмена" class="button" /> 
+        </form> 
+    </p>    
+</div>

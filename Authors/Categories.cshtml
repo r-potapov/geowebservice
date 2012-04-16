@@ -1,0 +1,68 @@
+﻿@{ 
+    var db = Database.Open("GoogleMaps"); 
+    var sqlSelect = "SELECT name FROM categories";
+    var currentCategories = db.Query(sqlSelect);
+    var newCategory = "";
+    
+    if(IsPost) 
+    { 
+        newCategory = Request["categoryName"]; 
+      
+        
+        if(newCategory.IsEmpty())
+        {
+            ModelState.AddError("categoryName", "Не введено название категории"); 
+        }
+        
+        if(!Validation.IsValidString(newCategory)) 
+        { 
+            ModelState.AddError("categoryName", "Не верный формат категории"); 
+        } 
+        
+        // Add new category
+        if(ModelState.IsValid) 
+        {
+            var sqlCommand = "INSERT INTO categories (name) VALUES (@0)"; 
+            db.Execute(sqlCommand, newCategory);
+        }
+    }
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Категории статей";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Some description</div>
+} 
+<div>
+    <h2>Текущие категории</h2> 
+    @* List all current roles *@ 
+    <ul> 
+        @foreach(var category in currentCategories)
+        { 
+            <li><a href="categoryDetails?categoryName=@category.name">@category.name</a></li> 
+        } 
+    </ul>
+</div> 
+<div> 
+    @* Form to add new roles to the membership database *@ 
+    <h2>Добавить новую категорию</h2>
+    @Html.ValidationSummary("Сохранение не удалось. Исправьте следующие ошибки:")
+    <form action="categories" method="post"> 
+        @Html.Label("Название категории: ", "categoryName") 
+        @Html.TextBox("categoryName", newCategory)
+        <input type="submit" value="Добавить" name="addRole" class="button"/><br />
+        @Html.ValidationMessage("categoryName")
+    </form>     
+</div>

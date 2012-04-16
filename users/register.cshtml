@@ -1,0 +1,93 @@
+﻿@{ 
+    var username = ""; 
+    var password1 = ""; 
+    var password2 = ""; 
+    
+    if(IsPost) 
+    { 
+        WebSecurity.Logout(); 
+         
+        username = Request["username"]; 
+        password1 = Request["password1"]; 
+        password2 = Request["password2"]; 
+         
+        // Validation 
+        if (username.IsEmpty()) { 
+            ModelState.AddError("username", "Не введено имя пользователя"); 
+        }
+        
+        if (!Validation.IsAlphaNumeric(username)) 
+        { 
+            ModelState.AddError("username", "Не верное имя пользователя"); 
+        }
+ 
+        if (password1.IsEmpty()) { 
+            ModelState.AddError("password1", "Не введен пароль"); 
+        }
+ 
+        if(WebSecurity.UserExists(username)) 
+        {
+            ModelState.AddError("username", String.Format("Пользователь с именем {0} уже существует", username)); 
+        }
+ 
+        if(password1 != password2) 
+        { 
+            ModelState.AddError("password2", "Пароли не совпадают"); 
+        }
+         
+        // Create Account 
+        if(ModelState.IsValid) 
+        { 
+            WebSecurity.CreateUserAndAccount(username, password1, null, false); 
+            WebSecurity.Login(username, password1); 
+            Response.Redirect(@Href("~/default"));
+        }
+    }
+       
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Регистрация нового пользователя";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+    <script type="text/javascript" src="@Href("~/js/checkuser.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Заполните поля формы</div>
+} 
+
+<h2>Форма регистрации</h2>        
+<div class="col_66">
+    @Html.ValidationSummary("Не удалось создать аккаунт. Причины:")
+    <form action="register" method="post" class="form">
+        <div class="field"> 
+            @Html.Label("Имя пользователя: ", "username")<br /> 
+            @Html.TextBox("username", username)
+            @Html.ValidationMessage("username")<br />
+            <span id="results"></span>
+        </div> 
+        <div class="field"> 
+            @Html.Label("Пароль: ", "password1")<br /> 
+            @Html.Password("password1", password1) 
+            @Html.ValidationMessage("password1")
+        </div> 
+        <div class="field"> 
+            @Html.Label("Повторите пароль: ", "password2")<br /> 
+            @Html.Password("password2", password2) 
+            @Html.ValidationMessage("password2")
+        </div> 
+        <div> 
+             <input type="submit" value="Подтвердить" class="button" /> 
+        </div> 
+    </form>
+</div>
+<div class="clearfix"></div>

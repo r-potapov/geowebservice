@@ -1,0 +1,27 @@
+﻿@{ 
+  WebSecurity.Logout(); 
+} 
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Выход";
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div> </div>
+} 
+
+<h2>Выход</h2>        
+<div class="col_66">
+    <p><a href="@Href("~/default")">Вернуться на главную</a></p>
+</div>
+<div class="clearfix"></div>

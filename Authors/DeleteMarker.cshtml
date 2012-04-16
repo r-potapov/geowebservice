@@ -1,0 +1,55 @@
+﻿@{ 
+    var id  = UrlData[0]; 
+    if (id.IsEmpty()) { 
+         Response.Redirect(@Href("~/maps/List")); 
+    }
+    
+    var db = Database.Open("GoogleMaps");
+    
+    if (IsPost) {
+        var sqlDelete = "DELETE FROM markers WHERE id=@0"; 
+        db.Execute(sqlDelete, id);
+        
+        // Удаление картинки
+        // var imagePath = @"~/images/" + id + ".png";
+        // if (File.Exists(Server.MapPath(imagePath))) 
+        // { 
+        //     File.Delete(imagePath);
+        // }
+        Response.Redirect("~/Articles/List.cshtml");
+    }
+    
+    var sqlSelect = "SELECT title FROM markers WHERE id=@0"; 
+ 
+    var row = db.QuerySingle(sqlSelect, id);
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Удаление статьи";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Текущая статья будет удалена</div>
+} 
+<div class="col_66">
+    <h2>Sample content</h2>
+    <p>Вы уверены, что хотите удалить статью @row.title?</p>
+    <form action="" method="post">
+        <div class="col_33">
+            <input type="submit" value="Удалить" class="button"/> 
+        </div>
+        <div class="col_33"> 
+            <input type="button" onclick="document.location.href='../List';" value="Отмена" class="button" /> 
+        </div>
+    </form>
+</div>

@@ -1,0 +1,7 @@
+﻿@{
+    if (!Roles.IsUserInRole(WebSecurity.CurrentUserName, "Authors") || !Roles.IsUserInRole(WebSecurity.CurrentUserName, "Moderators")) 
+    { 
+        string currentUrl = Request.Url.ToString(); 
+        Response.Redirect("~/users/login?sender=" + currentUrl); 
+    }
+}

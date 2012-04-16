@@ -1,0 +1,28 @@
+﻿@{
+    var username = Request["username"]; 
+    var errors = "";
+    
+    // Validation 
+    if (!username.IsEmpty()) { 
+        if (Validation.IsAlphaNumeric(username)) 
+        { 
+            if(WebSecurity.UserExists(username)) 
+            { 
+                ModelState.AddError("username", "Пользователь с таким именем уже существует"); 
+                errors+="Пользователь с таким именем уже существует";
+            }
+        }
+        else
+        {
+        errors+="Не верное имя пользователя";
+        }
+    }
+    
+    else
+    {
+        errors+="Не введено имя пользователя";
+    }
+    
+    Response.ContentType = "application/html";
+    Response.Write(errors);
+}

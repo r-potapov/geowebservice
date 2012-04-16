@@ -1,0 +1,50 @@
+﻿@{ 
+    var userName = Request["userName"]; 
+    var roleName = Request["roleName"]; 
+     
+    if(IsPost) 
+    { 
+        // Remove user from role 
+        if (Roles.IsUserInRole(userName, roleName)) 
+        { 
+            Roles.RemoveUsersFromRoles( 
+                new [] { userName }.ToArray(), 
+                new [] { roleName }.ToArray() 
+            ); 
+        } 
+         
+        Response.Redirect("roleDetails?roleName=" + roleName); 
+    }
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Удаление роли у пользователя";
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Удаление пользователя @userName из списка @roleName</div>
+} 
+<div class="col_66">
+    <h1>Удаление роли у пользователя</h1> 
+    <p>Вы уверены, что хотите удалить пользователя @userName из списка @roleName ?</p> 
+    <p> 
+        <form action="" method="post"> 
+            @Html.Hidden("roleName", roleName) 
+            @Html.Hidden("userName", userName) 
+            <input type="submit" value="Удалить" class="button" />
+            <input type="button"  
+                onclick="window.location.href='roleDetails.cshtml?roleName=@roleName';"  
+                value="Отмена" class="button" /> 
+        </form> 
+    </p>
+</div>

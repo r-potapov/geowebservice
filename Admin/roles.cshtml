@@ -1,0 +1,58 @@
+﻿@{ 
+    if(IsPost) 
+    { 
+        var newRole = Request["roleName"]; 
+      
+        // Add new role 
+        if(!newRole.IsEmpty() && !Roles.RoleExists(newRole)) 
+        { 
+            Roles.CreateRole(newRole); 
+        } 
+    } 
+     
+    var currentRoles = Roles.GetAllRoles();
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Список ролей в системе";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Some description</div>
+} 
+<div>
+    <h2>Текущие роли</h2> 
+    @if(currentRoles.Length > 0) 
+    { 
+        @* List all current roles *@ 
+        <ul> 
+        @foreach(var role in currentRoles) 
+        { 
+            <li><a href="roleDetails?roleName=@role">@role</a></li> 
+        } 
+        </ul> 
+    } 
+    else 
+    { 
+        <p>Еще ни одна роль не была определена.</p> 
+    } 
+</div> 
+<div> 
+    @* Form to add new roles to the membership database *@ 
+    <h2>Добавить новую роль</h2> 
+    <form action="roles" method="post"> 
+        @Html.Label("Название роли: ", "roleName") 
+        @Html.TextBox("roleName") 
+        <input type="submit" value="Добавить" name="addRole" class="button"/>
+    </form>     
+</div>

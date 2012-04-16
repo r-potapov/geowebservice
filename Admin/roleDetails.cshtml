@@ -1,0 +1,92 @@
+﻿@{ 
+    var roleName = Request["roleName"];
+    
+    if(roleName.IsEmpty()) 
+    {
+        Response.Redirect("roles");
+    }
+     
+    if(IsPost) 
+    { 
+        // Assign user to role 
+        var userName = Request["newUser"]; 
+         
+        if (!Roles.IsUserInRole(userName, roleName)) 
+        { 
+            Roles.AddUsersToRoles( 
+                new [] { userName }.ToArray(), 
+                new [] { roleName }.ToArray() 
+            ); 
+        } 
+    } 
+    
+    // Get all current role members 
+    var usersInRole = Roles.GetUsersInRole(roleName);
+    
+    // Get all users from database and create a list of SelectListItems 
+    var db = Database.Open("GoogleMaps");
+    var sqlCommand = "SELECT username FROM users ORDER BY username"; 
+     
+    List<SelectListItem> usersWithoutRole = new List<SelectListItem>();
+    foreach(var item in db.Query(sqlCommand)) 
+    { 
+        if (!Roles.IsUserInRole(item.username, roleName)) 
+        {
+            usersWithoutRole.Add(new SelectListItem { Text = item.username });
+        }
+    } 
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Список пользователей";
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Пользователи, имеющие выбранную роль - @roleName</div>
+} 
+<div class="col_66">
+    <h1>Список пользователей с ролью @roleName</h1> 
+    <div> 
+        @if(usersInRole.Length > 0) 
+        { 
+            <ul> 
+                @foreach(var user in usersInRole) 
+                { 
+                    <li>@user  
+                        <a href="removeUserFromRole?roleName=@roleName&userName=@user"> 
+                            [Удалить] 
+                        </a> 
+                    </li> 
+                } 
+            </ul> 
+        } 
+        else 
+        { 
+            <p>Ни один пользователь еще не был ассоциирован с данной ролью.</p> 
+            <p><a href="deleteRole?roleName=@roleName">Удалить эту роль</a></p> 
+        } 
+    </div> 
+    @if (usersWithoutRole.Any())
+    {
+        <div>
+            @* Form to assign users to the current role *@ 
+            <form action="roleDetails" method="post" class="form">
+                <h3>Добавить пользователя</h3> 
+                @Html.Hidden("roleName", roleName) 
+                @Html.Label("Пользователь: ", "newUser") 
+                @Html.DropDownList("newUser", usersWithoutRole) 
+               <input type="submit" value="Подтвердить" name="addUser" class="button" /> 
+            </form>
+        </div>
+    }
+</div>

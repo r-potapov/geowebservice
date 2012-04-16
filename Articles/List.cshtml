@@ -1,0 +1,39 @@
+﻿@{ 
+    var db = Database.Open("GoogleMaps"); 
+    var sqlCommand = "SELECT * FROM markers"; 
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Статьи";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Some description</div>
+} 
+
+<h2>Sample content</h2>
+    
+      @foreach (var article in db.Query(sqlCommand))
+        {
+            <div class="col_66">
+                <h2>@article.title</h2> 
+                <p>@article.description</p>
+                <p><a href="@Href("~/articles/article", @article.id)">Продолжить чтение</a>
+                @if (Roles.IsUserInRole(WebSecurity.CurrentUserName, "Authors")) 
+                {
+                    <p><a href="@Href("~/Authors/EditMarker", @article.id)">Редактировать</a> 
+                    <a href="@Href("~/Authors/DeleteMarker", @article.id)">Удалить</a></p> 
+                }
+            </div>
+        }
+    <div class="clearfix"></div>

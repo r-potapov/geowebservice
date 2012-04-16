@@ -1,0 +1,55 @@
+﻿@{ 
+    var db = Database.Open("GoogleMaps"); 
+    var sqlCommand = "SELECT title, description, icon, content FROM markers"; 
+    var result = db.Query(sqlCommand);
+    var markerGrid = new WebGrid(result, 
+                                 defaultSort: "title", 
+                                 rowsPerPage: 3);
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "List of markers";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Some description</div>
+} 
+
+<h2>Sample content</h2>        
+<div class="col_66">
+  @markerGrid.GetHtml( 
+                mode: WebGridPagerModes.All, 
+                firstText: "First", 
+                previousText: "Prev", 
+                nextText: "Next", 
+                lastText: "Last",
+                columns: markerGrid.Columns( 
+                    markerGrid.Column("title",
+                                      "Title",
+                                      format: @<text> 
+                                                <h3>@item.title</h3>
+                                              </text>), 
+                    markerGrid.Column("description",
+                                      "Description"), 
+                    markerGrid.Column("icon",  
+                                      "Icon", 
+                                      format: @<text> 
+                                                <img src="@item.icon" title="icon" alt="icon" />
+                                              </text>), 
+                    markerGrid.Column("content", 
+                                      "Content")
+                ) 
+)
+</div>
+<div class="clearfix"></div>
+<a href="NewMarker.cshtml">New Marker</a>

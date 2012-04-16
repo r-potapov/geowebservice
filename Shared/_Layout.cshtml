@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link type="text/css" href="@Href("~/css/style.css")" rel="stylesheet" media="all" />
+        <link type="text/css" href="@Href("~/css/style2.css")" rel="stylesheet" media="all" />
+        @RenderSection("scripts", required: false)
+        <title>@RenderSection("title")</title>
+    </head>
+    <body>
+        
+        <div class="container">
+
+    <header class="header clearfix">
+      <div class="logo">.Simpliste</div>
+
+      <nav class="menu_main">
+        <ul>
+          @MembershipHelpers.AccountSummary()
+        </ul>
+        <ul>
+          <li><a href="@Href("~/default")">На главную</a></li>
+          <li><a href="@Href("~/Articles/map")">Карта</a></li>
+          <li><a href="@Href("~/Articles/list")">Статьи</a></li>
+        </ul>
+      </nav>
+    </header>
+
+
+    <div class="info">
+      <article class="hero clearfix">
+        <div class="col_100">
+          @RenderSection("description") 
+        </div>
+      </article>
+
+
+      <article class="article clearfix">
+        <div class="col_100">
+          @RenderBody()
+      </article>
+    </div>
+    
+    <footer class="footer clearfix">
+      <div class="copyright"><a href="http://cssr.ru/simpliste/ru.html" style="color:#fff; text-decoration:none" target="_blank">Keep it simplest</a></div>
+
+      <nav class="menu_bottom">
+        <ul>
+          <li><a href="@Href("~/default")">На главную</a></li>
+          <li><a href="@Href("~/maps/mapajax")">Карта</a></li>
+          <li><a href="@Href("~/maps/list")">Статьи</a></li>
+        </ul>
+      </nav>
+    </footer>
+
+  </div>
+    </body>
+</html>

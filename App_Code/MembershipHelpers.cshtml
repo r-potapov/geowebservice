@@ -1,0 +1,18 @@
+﻿@helper AccountSummary() 
+{
+    if(WebSecurity.IsAuthenticated) {
+        <li>Вы вошли как <a href="@Href("~/users/changePassword")">@WebSecurity.CurrentUserName</a></li>
+        if (Roles.IsUserInRole(WebSecurity.CurrentUserName, "Administrators")) 
+        {
+            <li><a href="@Href("~/Admin/roles")">Управление ролями</a></li>
+        }
+        if (Roles.IsUserInRole(WebSecurity.CurrentUserName, "Authors")) 
+        {
+            <li><a href="@Href("~/Authors/NewMarker.cshtml")">Новая статья</a></li>
+        }
+        <li><a href="@Href("~/users/logout")">Выход</a></li>
+    } else {
+        <li><a href="@Href("~/users/login")">Вход</a></li>
+        <li><a href="@Href("~/users/register")">Регистрация</a></li>
+    }
+}

@@ -1,0 +1,16 @@
+﻿@{ 
+    //if(isPost)
+   // {
+        //var date = Request["date"];
+        var date = Convert.ToDateTime(Request["date"]);
+        string format = "yyyy-MM-dd HH:mm:ss";
+	    var date1 = date.ToString(format);
+        var date2 = date.AddSeconds(86399).ToString(format);
+        var db = Database.Open("GoogleMaps"); 
+        var sqlCommand = "SELECT id, title, position_lat, position_lng, description, icon, content, picture_url FROM markers WHERE pub_date BETWEEN @0 AND @1";
+        var result = db.Query(sqlCommand, date1, date2);
+    
+        Response.ContentType = "application/json";
+        Response.Write(Json.Encode(result));
+    //}
+}

@@ -1,0 +1,84 @@
+﻿@{ 
+    var username = ""; 
+    var password = "";
+    
+    if(IsPost) 
+    { 
+        WebSecurity.Logout(); 
+         
+        username = Request["username"]; 
+        password = Request["password"];
+        var rememberMe = Request["rememberMe"].AsBool();
+         
+        // Validation 
+        if (username.IsEmpty()) { 
+            ModelState.AddError("username", "Не введено имя пользователя"); 
+        }
+        
+        if (!Validation.IsAlphaNumeric(username)) 
+        { 
+            ModelState.AddError("username", "Не верное имя пользователя"); 
+        }
+ 
+        if (password.IsEmpty()) { 
+            ModelState.AddError("password", "Не введен пароль"); 
+        }
+ 
+        // Attempt login
+        if(ModelState.IsValid) 
+        {
+            if(WebSecurity.Login(username, password, rememberMe)) 
+            { 
+                Response.Redirect("~/default"); 
+            } 
+            else 
+            { 
+                ModelState.AddFormError("Unable to log in.");
+            }
+        }
+    }
+       
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Вход на сайт";
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Заполните поля формы</div>
+} 
+
+<h2>Вход</h2>        
+<div class="col_66">
+    @Html.ValidationSummary(true)
+    <form action="login" method="post" class="form">
+        <div class="field"> 
+            @Html.Label("Имя пользователя: ", "username")<br /> 
+            @Html.TextBox("username", username) 
+            @Html.ValidationMessage("username")
+        </div> 
+        <div class="field"> 
+            @Html.Label("Пароль: ", "password")<br /> 
+            @Html.Password("password", password) 
+            @Html.ValidationMessage("password")
+        </div> 
+        <div class="field">
+            @Html.CheckBox("rememberMe", new { value = "true" }) 
+            @Html.Label("Запомнить", "rememberMe") 
+        </div>
+        <div> 
+             <input type="submit" value="Войти" class="button" /> 
+        </div> 
+    </form>
+</div>
+<div class="clearfix"></div>

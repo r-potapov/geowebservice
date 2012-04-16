@@ -1,0 +1,153 @@
+﻿@{ 
+    var id  = UrlData[0]; 
+    if (id.IsEmpty()) { 
+         Response.Redirect(@Href("~/maps/List")); 
+    } 
+     
+    var category_id = "";
+    var title = "";
+    var position_lat = "";
+    var position_lng = "";
+    var description = "";
+    var icon = "";
+    var content = "";
+    var db = Database.Open("GoogleMaps");
+    var sqlCommand = "SELECT id, name FROM categories ORDER BY name"; 
+     
+    List<SelectListItem> currentCategories = new List<SelectListItem>();
+    foreach(var item in db.Query(sqlCommand)) 
+    {
+        currentCategories.Add(new SelectListItem { Value = item.id.ToString(), Text = item.name });
+    } 
+    
+    if (IsPost) {
+        category_id = Request["category"];
+        title = Request["title"];
+        position_lat = Request["position_lat"];
+        position_lng = Request["position_lng"];
+        description = Request["description"];
+        icon = Request["icon"];
+        content = Request.Unvalidated("content");
+        
+        if (title.IsEmpty())
+        { 
+            ModelState.AddError("title", "The title field is required"); 
+        } 
+        
+        if (position_lat.IsEmpty()) 
+        { 
+            ModelState.AddError("position_lat", "The Position Lat field is required"); 
+        }
+        
+        if (!Validation.IsFloat(position_lat)) 
+        { 
+            ModelState.AddError("position_lat", "The Position Lat field must be float"); 
+        }
+        
+        if (position_lng.IsEmpty()) 
+        { 
+            ModelState.AddError("position_lng", "The Position Lng field is required"); 
+        } 
+        
+        if (!Validation.IsFloat(position_lng)) 
+        { 
+            ModelState.AddError("position_lng", "The Position Lng field must be float"); 
+        }
+ 
+        if (ModelState.IsValid) 
+        {
+            sqlCommand = "UPDATE markers SET title = @0, position_lat = @1, " + 
+                "position_lng = @2, description = @3, icon = @4, content = @5, category_id = @6 " +  
+                "WHERE id = @7";
+            db.Execute(sqlCommand, title, position_lat, position_lng, description, icon, content, category_id, id);
+            
+            Response.Redirect("~/Articles/List.cshtml"); 
+        }
+    }
+    
+    var sqlSelect = "SELECT * FROM markers WHERE id=@0"; 
+ 
+    var row = db.QuerySingle(sqlSelect, id);
+    
+    title = row.title;
+    position_lat = row.position_lat.ToString();
+    position_lng = row.position_lng.ToString();
+    description = row.description;
+    icon = row.icon;
+    content = row.content;
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Editing marker";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+    <script type="text/javascript">
+    _editor_url  = "/xinha/"   // (preferably absolute) URL (including trailing slash) where Xinha is installed
+    _editor_lang = "ru";       // And the language we need to use in the editor.
+    _editor_skin = "silva";    // If you want use a skin, add the name (of the folder) here
+    _editor_icons = "classic"; // If you want to use a different iconset, add the name (of the folder, under the `iconsets` folder) here
+  </script>
+  <script type="text/javascript" src="@Href("~/xinha/XinhaCore.js")"></script>
+  <script type="text/javascript" src="@Href("~/xinha/my_config.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div>Some description</div>
+} 
+<div class="col_66">
+    <h2>Sample content</h2>
+    @Html.ValidationSummary("Please correct the following errors:")
+    <form action="" method="post" class="form">
+        <fieldset>
+            <legend>Marker Details</legend>
+            <div>
+                @Html.Label("Категория: ", "category") 
+                @Html.DropDownList("category", currentCategories) 
+            </div>
+            <div>
+                @Html.Label("Заголовок: ", "title") 
+                @Html.TextBox("title", title, new { maxlength = "50", size = "55" } )
+                @Html.ValidationMessage("title")
+            </div> 
+            <div> 
+                @Html.Label("Position Lat: ", "position_lat") 
+                @Html.TextBox("position_lat", position_lat)
+                @Html.ValidationMessage("position_lat")
+            </div> 
+            <div> 
+                @Html.Label("Position Lng: ", "position_lng") 
+                @Html.TextBox("position_lng", position_lng)
+                @Html.ValidationMessage("position_lng")
+            </div> 
+            <div> 
+                @Html.Label("Описание: ", "description") 
+                @Html.TextBox("description", description, new { maxlength = "50", size = "55" } )
+                @Html.ValidationMessage("description")
+            </div> 
+            <div> 
+                @Html.Label("Значок: ", "icon") 
+                @Html.TextBox("icon", icon)
+                @Html.ValidationMessage("icon")
+            </div> 
+            <div> 
+                @Html.Label("Основной текст: ", "content") <br />
+                @Html.TextArea("content", content, 5, 100, null) 
+                @Html.ValidationMessage("content")
+            </div>
+        </fieldset> 
+            <div> 
+                <input type="submit" value="Сохранить" class="button"/>
+                <input type="button"  
+                onclick="window.top.location.href='Articles/List.cshtml';"  
+                value="Отмена" class="button" /> 
+            </div>
+    </form>
+</div>

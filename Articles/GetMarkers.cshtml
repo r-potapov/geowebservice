@@ -1,0 +1,8 @@
+﻿@{ 
+    var db = Database.Open("GoogleMaps"); 
+    var sqlCommand = "SELECT id, title, position_lat, position_lng ,description, icon, content, picture_url FROM markers"; 
+    var result = db.Query(sqlCommand);
+    
+    Response.ContentType = "application/json";
+    Response.Write(Json.Encode(result));
+}

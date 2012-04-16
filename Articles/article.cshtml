@@ -1,0 +1,49 @@
+﻿@{ 
+    var id  = UrlData[0]; 
+    if (id.IsEmpty()) { 
+         Response.Redirect(@Href("~/articles/List")); 
+    } 
+     
+    var db = Database.Open("GoogleMaps");
+    
+    var sqlSelect = "SELECT * FROM markers WHERE id=@0"; 
+ 
+    var article = db.QuerySingle(sqlSelect, id);
+}
+
+@{  
+    Layout = "/Shared/_Layout.cshtml"; 
+    var PageTitle = "Просмотр статьи";  
+}
+ 
+@section scripts {
+    <script type="text/javascript" src="@Href("~/js/jquery-1.7.1.min.js")"></script>
+}
+
+@section title { 
+    @PageTitle 
+} 
+
+@section description {
+    <h2>@PageTitle</h2>
+    <div></div>
+} 
+<div class="col_66">
+        <h2>@article.title</h2>
+        <p>@article.description</p> 
+        @Html.Raw(article.content)
+        @if (Roles.IsUserInRole(WebSecurity.CurrentUserName, "Authors")) 
+        {
+            <p><a href="@Href("~/Authors/EditMarker", @article.id)">Редактировать</a> 
+                <a href="@Href("~/Authors/DeleteMarker", @article.id)">Удалить</a></p>
+        }
+</div>
+<br />
+<div class="col_33">
+    @if(!String.IsNullOrEmpty(article.picture_url)) 
+    {
+            <img class="img_floatright" 
+                 src="@Href(article.picture_url)" 
+                 alt="@article.title" />
+    }
+</div>
